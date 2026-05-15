@@ -1,0 +1,35 @@
+# ─────────────────────────────────────────────────────────
+#  docker-compose.yml
+#  Usage:
+#    docker compose up --build          # first time
+#    docker compose up                  # subsequent runs
+#    docker compose down                # stop
+# ─────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: social-engagement:latest
+    container_name: social_engagement_app
+    ports:
+      - "8501:8501"
+    env_file:
+      - .env
+    volumes:
+      # Mount data dirs so CSVs/DB persist between restarts
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+      - ./reports:/app/reports
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c",
+             "import urllib.request; urllib.request.urlopen('http://localhost:8501/_stcore/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
