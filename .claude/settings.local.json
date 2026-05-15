@@ -26,7 +26,23 @@
       "Bash(PYTHONPATH=. venv/bin/python -m src.pipeline.report_generator)",
       "Bash(open \"/Users/gaurav/Desktop/MAJOR project/reports/final_report.html\")",
       "Bash(git init *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(PYTHONPATH=. venv/bin/streamlit run src/dashboard/app.py --server.headless true)",
+      "Bash(lsof -ti:8501)",
+      "Bash(venv/bin/pip show *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --disable-gpu --no-sandbox '--print-to-pdf=/Users/gaurav/Desktop/MAJOR project/submission_docs/Abstract.pdf' --print-to-pdf-no-header 'file:///Users/gaurav/Desktop/MAJOR project/submission_docs/Abstract.html')",
+      "Bash(echo \"Abstract PDF: $?\")",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless=new --disable-gpu --no-sandbox '--print-to-pdf=/Users/gaurav/Desktop/MAJOR project/submission_docs/How_To_Run.pdf' --print-to-pdf-no-header 'file:///Users/gaurav/Desktop/MAJOR project/submission_docs/How_To_Run.html')",
+      "Bash(echo \"How_To_Run PDF: $?\")",
+      "Bash(venv/bin/python -m playwright install chromium)",
+      "Bash(open \"/Users/gaurav/Desktop/MAJOR project/submission_docs/screenshots/01_Dashboard_Overview.png\")",
+      "Bash(open \"/Users/gaurav/Desktop/MAJOR project/submission_docs/Abstract.pdf\")",
+      "Bash(cat > *)",
+      "Read(//Users/gaurav/Desktop/**)",
+      "Bash(zip -r Gaurav_Ganesh_Teegulla_DataScience_MajorProject_Mar2026.zip Gaurav_Ganesh_Teegulla_DataScience_MajorProject_Mar2026 --exclude '*/.DS_Store' --exclude '*/ADD_PPT_HERE.txt' -q)",
+      "Bash(echo \"Zip done: $?\")"
     ]
   }
 }

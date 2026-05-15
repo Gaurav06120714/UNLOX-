@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Times New Roman", serif; background: white; color: black; padding: 60px 80px; font-size: 12pt; line-height: 1.6; }
+  .cover { text-align: center; margin-bottom: 36px; border-bottom: 2px solid black; padding-bottom: 24px; }
+  .cover h1 { font-size: 20pt; font-weight: bold; margin-bottom: 8px; }
+  .cover h2 { font-size: 13pt; font-weight: normal; margin-bottom: 6px; }
+  .cover p { font-size: 11pt; margin: 3px 0; }
+  .section { margin-bottom: 28px; }
+  .section-title { font-size: 12pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid black; padding-bottom: 4px; margin-bottom: 10px; }
+  p { margin-bottom: 8px; }
+  ul { margin-left: 24px; margin-bottom: 8px; }
+  li { margin-bottom: 4px; }
+  pre, code { font-family: "Courier New", monospace; font-size: 10pt; background: #f5f5f5; border: 1px solid #ccc; }
+  pre { padding: 10px 14px; margin: 8px 0; white-space: pre-wrap; word-break: break-word; }
+  code { padding: 1px 4px; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; margin-bottom: 8px; }
+  th { background: black; color: white; padding: 6px 10px; text-align: left; font-size: 10pt; }
+  td { padding: 5px 10px; border-bottom: 1px solid #ccc; font-size: 10pt; }
+  .step-num { font-weight: bold; }
+  .note { border-left: 3px solid black; padding-left: 10px; margin: 8px 0; font-style: italic; font-size: 10.5pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Execution Guide</h1>
+  <h2>Data-Driven Social Engagement Initiative</h2>
+  <p><strong>Author:</strong> Gaurav Ganesh Teegulla &nbsp;|&nbsp; <strong>Course:</strong> Data Science &nbsp;|&nbsp; <strong>Batch:</strong> March 2026</p>
+  <p><strong>Email:</strong> gauravganeshteegulla@gmail.com</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 1 — System Requirements</div>
+  <table>
+    <tr><th>Requirement</th><th>Specification</th></tr>
+    <tr><td>Operating System</td><td>Windows 10+ / macOS 12+ / Ubuntu 20.04+</td></tr>
+    <tr><td>Python Version</td><td>3.10 or higher (3.11 recommended)</td></tr>
+    <tr><td>RAM</td><td>4 GB minimum — 8 GB recommended</td></tr>
+    <tr><td>Storage</td><td>500 MB free space</td></tr>
+    <tr><td>Internet Connection</td><td>Required for YouTube API calls (optional for dummy mode)</td></tr>
+    <tr><td>Docker (optional)</td><td>Docker Desktop 4.0+ for container deployment</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 2 — Prerequisites</div>
+  <p><strong>macOS Only — Install OpenMP runtime for XGBoost:</strong></p>
+  <p>XGBoost requires the OpenMP library on Mac. Run this once before setup:</p>
+  <pre>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+brew install libomp</pre>
+  <p class="note">Windows and Linux users can skip this step. libomp ships with XGBoost on those platforms.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 3 — Setup (One Command)</div>
+  <p><span class="step-num">Step 1.</span> Extract the source code zip file to your preferred location.</p>
+  <p><span class="step-num">Step 2.</span> Open Terminal (Mac/Linux) or Command Prompt (Windows) and navigate into the project folder:</p>
+  <pre>cd "MAJOR project"</pre>
+  <p><span class="step-num">Step 3.</span> Run the automated setup script:</p>
+  <pre>bash setup.sh</pre>
+  <p>This script will automatically:</p>
+  <ul>
+    <li>Create a Python virtual environment in <code>venv/</code></li>
+    <li>Install all dependencies listed in <code>requirements.txt</code></li>
+    <li>Create required folders: <code>data/</code>, <code>models/</code>, <code>logs/</code>, <code>reports/</code></li>
+  </ul>
+  <p><span class="step-num">Step 4.</span> Activate the virtual environment:</p>
+  <pre># macOS / Linux:
+source venv/bin/activate
+
+# Windows:
+venv\Scripts\activate</pre>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 4 — API Key Setup (Optional)</div>
+  <p class="note">The project runs fully without an API key using built-in realistic dummy data. This step is only needed to connect your own YouTube channel.</p>
+  <p><span class="step-num">Step 1.</span> Copy the environment template:</p>
+  <pre>cp .env.example .env</pre>
+  <p><span class="step-num">Step 2.</span> Open <code>.env</code> in any text editor and fill in your credentials:</p>
+  <pre>YOUTUBE_API_KEY=your_api_key_here
+YOUTUBE_CHANNEL_ID=your_channel_id_here</pre>
+  <p><span class="step-num">Step 3.</span> To get a free YouTube Data API v3 key, visit <strong>console.cloud.google.com</strong> → APIs &amp; Services → Enable YouTube Data API v3 → Create Credentials → API Key.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 5 — Run the Full Pipeline</div>
+  <p>Run all 7 stages in sequence with one command:</p>
+  <pre>python run_pipeline.py</pre>
+  <p>Expected terminal output:</p>
+  <pre>▶  Stage 1: Data Extraction
+   30 videos, 200 comments extracted and saved.
+▶  Stage 2: Viral Score Engine
+   Viral scores computed for 30 videos.
+▶  Stage 3: Sentiment Analysis
+   Sentiment labels assigned to 200 comments.
+▶  Stage 4: A/B Testing
+   4 A/B tests completed.
+▶  Stage 5: Virality ML Model
+   RMSE=11.19, R²=0.837, CV-R²=0.936±0.025
+▶  Stage 6: Recommendation Engine
+   7 recommendations generated.
+▶  Stage 7: Trend Forecasting
+   90-day forecast complete. [prophet]
+Pipeline finished.</pre>
+  <p>To run individual stages separately:</p>
+  <pre>python run_pipeline.py --stage extract
+python run_pipeline.py --stage score
+python run_pipeline.py --stage sentiment
+python run_pipeline.py --stage ab_test
+python run_pipeline.py --stage virality
+python run_pipeline.py --stage recommend
+python run_pipeline.py --stage forecast</pre>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 6 — Launch the Interactive Dashboard</div>
+  <pre>streamlit run src/dashboard/app.py</pre>
+  <p>Open your browser and go to: <strong>http://localhost:8501</strong></p>
+  <p>The dashboard contains 9 pages accessible from the left sidebar:</p>
+  <table>
+    <tr><th>Page</th><th>Description</th></tr>
+    <tr><td>1. Overview</td><td>KPI cards, top 10 video table, views vs likes scatter</td></tr>
+    <tr><td>2. Engagement Trends</td><td>Monthly bar and area charts for views/likes/comments</td></tr>
+    <tr><td>3. Viral Score</td><td>Leaderboard, violin distribution, per-video gauge chart</td></tr>
+    <tr><td>4. Sentiment Analysis</td><td>Sentiment pie chart, polarity histogram, per-video heatmap</td></tr>
+    <tr><td>5. Best Posting Time</td><td>Day-of-week bars and day × hour heatmap</td></tr>
+    <tr><td>6. A/B Testing</td><td>Pre-built test results + custom test builder with paste input</td></tr>
+    <tr><td>7. Virality Predictor</td><td>Live ML prediction form — enter video details, get a score</td></tr>
+    <tr><td>8. Recommendations</td><td>7 confidence-ranked strategy cards with evidence</td></tr>
+    <tr><td>9. Trend Forecast</td><td>90-day Prophet chart with confidence intervals + keyword velocity</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 7 — View the Auto-Generated HTML Report</div>
+  <p>After the pipeline runs, a self-contained HTML report is generated automatically:</p>
+  <pre>reports/final_report.html</pre>
+  <p>Double-click the file to open it in any browser. No server or internet connection is required. All charts are embedded directly inside the HTML file as base64 images.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 8 — Docker Deployment (Alternative Method)</div>
+  <p>If Docker Desktop is installed, run the entire project in a container:</p>
+  <pre># Build and launch:
+docker compose up --build
+
+# Then open: http://localhost:8501
+
+# Stop when done:
+docker compose down</pre>
+  <p class="note">Docker automatically installs all dependencies and runs the pipeline inside the container. No Python setup needed on the host machine.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 9 — Troubleshooting</div>
+  <table>
+    <tr><th>Error</th><th>Fix</th></tr>
+    <tr><td><code>ModuleNotFoundError</code></td><td>Run <code>pip install -r requirements.txt</code> again inside the activated venv</td></tr>
+    <tr><td>XGBoost library load error (Mac)</td><td>Run <code>brew install libomp</code> then retry</td></tr>
+    <tr><td><code>Prophet import error</code></td><td>Run <code>pip install prophet</code> separately</td></tr>
+    <tr><td>Dashboard shows blank/empty charts</td><td>Run the pipeline first: <code>python run_pipeline.py</code></td></tr>
+    <tr><td>Port 8501 already in use</td><td>Run <code>streamlit run src/dashboard/app.py --server.port 8502</code></td></tr>
+    <tr><td>API returns no data</td><td>Project uses dummy data automatically — no action needed</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Section 10 — Project Folder Structure</div>
+  <pre>MAJOR project/
+├── run_pipeline.py          ← master pipeline runner (entry point)
+├── requirements.txt         ← all Python dependencies
+├── setup.sh                 ← one-shot automated setup script
+├── Dockerfile               ← Docker container definition
+├── docker-compose.yml       ← multi-service Docker config
+├── README.md                ← full project documentation
+├── config/
+│   └── settings.py          ← central configuration and constants
+├── src/
+│   ├── api/
+│   │   ├── youtube_client.py    ← YouTube Data API v3 wrapper
+│   │   └── dummy_data.py        ← realistic dummy data generator
+│   ├── pipeline/
+│   │   ├── extract.py           ← Stage 1: data extraction
+│   │   ├── viral_score.py       ← Stage 2: viral score computation
+│   │   └── report_generator.py  ← auto HTML report generation
+│   ├── nlp/
+│   │   └── sentiment.py         ← TextBlob sentiment classifier
+│   ├── ml/
+│   │   ├── ab_testing.py        ← Welch's t-test A/B framework
+│   │   ├── virality_model.py    ← XGBoost virality predictor
+│   │   ├── recommender.py       ← TF-IDF strategy recommender
+│   │   └── forecasting.py       ← Prophet trend forecaster
+│   ├── dashboard/
+│   │   └── app.py               ← 9-page Streamlit application
+│   └── utils/
+│       ├── db.py                ← SQLite database helper
+│       └── logger.py            ← Loguru rotating logger
+├── data/
+│   ├── raw/                     ← videos.csv, comments.csv
+│   └── processed/               ← scored + sentiment enriched CSVs
+├── models/
+│   └── virality_model.joblib    ← saved trained XGBoost model
+└── reports/
+    └── final_report.html        ← auto-generated analytics report</pre>
+</div>
+
+</body>
+</html>

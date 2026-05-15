@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: "Times New Roman", serif; background: white; color: black; padding: 60px 80px; font-size: 12pt; line-height: 1.6; }
+  .cover { text-align: center; margin-bottom: 40px; border-bottom: 2px solid black; padding-bottom: 30px; }
+  .cover h1 { font-size: 20pt; font-weight: bold; margin-bottom: 10px; }
+  .cover h2 { font-size: 14pt; font-weight: normal; margin-bottom: 6px; }
+  .cover p { font-size: 12pt; margin: 3px 0; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 13pt; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid black; padding-bottom: 4px; margin-bottom: 10px; }
+  p { margin-bottom: 8px; }
+  ul { margin-left: 24px; margin-bottom: 8px; }
+  li { margin-bottom: 4px; }
+  .metrics { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 8px; }
+  .metric-box { border: 1px solid black; padding: 8px 16px; text-align: center; min-width: 140px; }
+  .metric-box .val { font-size: 16pt; font-weight: bold; }
+  .metric-box .lbl { font-size: 9pt; }
+  table { width: 100%; border-collapse: collapse; margin-top: 8px; }
+  th { background: black; color: white; padding: 6px 10px; text-align: left; font-size: 10pt; }
+  td { padding: 5px 10px; border-bottom: 1px solid #ccc; font-size: 10pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <h1>Data-Driven Social Engagement Initiative</h1>
+  <h2>Major Project / Capstone Project</h2>
+  <p><strong>Student Name:</strong> Gaurav Ganesh Teegulla</p>
+  <p><strong>Registered Email:</strong> gauravganeshteegulla@gmail.com</p>
+  <p><strong>Course:</strong> Data Science</p>
+  <p><strong>Batch:</strong> March 2026 &nbsp;|&nbsp; <strong>Institution:</strong> Unlox Academy</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Problem Statement</div>
+  <p>Content creators and digital marketers lack a systematic, data-driven approach to understanding why certain content performs better than others. Decisions around posting time, content type, and topic selection are largely made on intuition rather than evidence. This results in inconsistent engagement, wasted effort, and missed growth opportunities on social media platforms.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Objective</div>
+  <p>To design and build a complete end-to-end Machine Learning analytics ecosystem that automatically collects social media performance data, applies statistical and ML models to extract actionable insights, and delivers strategy recommendations through a 9-page interactive dashboard — demonstrating the full data science lifecycle from ingestion to serving.</p>
+</div>
+
+<div class="section">
+  <div class="section-title">Modules Built</div>
+  <ul>
+    <li><strong>Module 1 — Content Performance Tracker:</strong> Automated data extraction via YouTube Data API v3. Fetches video metadata, engagement metrics, and audience comments. Stores structured data in CSV and SQLite database with a hybrid real + dummy data mode for development.</li>
+    <li><strong>Module 2 — Viral Score Engine:</strong> Computes a 0–100 Viral Score per video using a weighted min-max normalisation formula across five engagement dimensions: views, likes, comments, like rate, and comment rate.</li>
+    <li><strong>Module 3 — NLP Sentiment Analyser:</strong> TextBlob-based sentiment classification of audience comments into Positive, Neutral, and Negative categories with polarity scores (-1 to +1) and subjectivity scoring.</li>
+    <li><strong>Module 4 — A/B Testing Framework:</strong> Statistical hypothesis testing using Welch's t-test (unequal variance), Cohen's d effect size measurement, and Lift % calculation across four content variables: posting time, video length, tag count, and description length.</li>
+    <li><strong>Module 5 — Virality Prediction Model:</strong> XGBoost Regressor trained on 16 engineered features to predict viral score from video metadata. Achieved R² = 0.84 on test set and Cross-Validation R² = 0.94 ± 0.02 across 5 folds.</li>
+    <li><strong>Module 6 — Content Recommender:</strong> TF-IDF vectorisation on top-quartile video titles extracts high-performing keywords. Generates 7 ranked, confidence-scored strategy recommendations with evidence-backed rationale.</li>
+    <li><strong>Module 7 — Trend Forecaster:</strong> Facebook Prophet model with Holt-Winters ETS fallback for 90-day engagement forecasting with 80% confidence intervals, plus keyword trend velocity analysis (Rising / Falling / Stable).</li>
+  </ul>
+</div>
+
+<div class="section">
+  <div class="section-title">Tech Stack</div>
+  <table>
+    <tr><th>Layer</th><th>Tools</th></tr>
+    <tr><td>Data</td><td>Python, Pandas, NumPy, SQLite</td></tr>
+    <tr><td>API</td><td>YouTube Data API v3, Requests</td></tr>
+    <tr><td>NLP</td><td>TextBlob, Scikit-learn TF-IDF</td></tr>
+    <tr><td>Machine Learning</td><td>XGBoost, Scikit-learn, SciPy</td></tr>
+    <tr><td>Forecasting</td><td>Facebook Prophet, Statsmodels ETS</td></tr>
+    <tr><td>Dashboard</td><td>Streamlit, Plotly, Matplotlib</td></tr>
+    <tr><td>Deployment</td><td>Docker, Streamlit Cloud</td></tr>
+    <tr><td>Utilities</td><td>Loguru, Joblib, Python-dotenv</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <div class="section-title">Key Results</div>
+  <div class="metrics">
+    <div class="metric-box"><div class="val">0.84</div><div class="lbl">XGBoost R²</div></div>
+    <div class="metric-box"><div class="val">0.94</div><div class="lbl">Cross-Val R²</div></div>
+    <div class="metric-box"><div class="val">9</div><div class="lbl">Dashboard Pages</div></div>
+    <div class="metric-box"><div class="val">90</div><div class="lbl">Day Forecast</div></div>
+    <div class="metric-box"><div class="val">7</div><div class="lbl">Recommendations</div></div>
+    <div class="metric-box"><div class="val">35</div><div class="lbl">Source Files</div></div>
+    <div class="metric-box"><div class="val">4,745</div><div class="lbl">Lines of Code</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Outcome</div>
+  <p>A fully functional, production-deployed ML analytics platform demonstrating the complete data science lifecycle: data ingestion → feature engineering → model training → evaluation → serving. The system is packaged as a Docker container and an interactive Streamlit web application, and generates a self-contained 181KB HTML analytical report automatically.</p>
+  <p><strong>Resume Description:</strong> Built an end-to-end ML analytics ecosystem integrating YouTube Data API v3, TextBlob NLP sentiment classification, XGBoost virality prediction (R²=0.84), Welch's t-test A/B testing framework, TF-IDF content recommendation engine, and Facebook Prophet 90-day trend forecasting. Delivered a 9-page interactive Streamlit dashboard with real-time ML predictions. Deployed via Docker and Streamlit Cloud.</p>
+</div>
+
+</body>
+</html>
