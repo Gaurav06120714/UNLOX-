@@ -1,20 +1,3 @@
-"""
-run_pipeline.py
-───────────────
-Master orchestrator — runs every pipeline stage in order.
-
-Usage:
-    python run_pipeline.py                   # full pipeline
-    python run_pipeline.py --stage extract
-    python run_pipeline.py --stage score
-    python run_pipeline.py --stage sentiment
-    python run_pipeline.py --stage ab_test
-    python run_pipeline.py --stage virality
-    python run_pipeline.py --stage recommend
-    python run_pipeline.py --stage forecast
-    python run_pipeline.py --stage all
-"""
-
 import argparse
 import sys
 from pathlib import Path
@@ -29,25 +12,25 @@ log = get_logger("pipeline")
 
 
 def run_extract():
-    log.info("▶  Stage 1: Data Extraction")
+    log.info("Step 1: Extracting data from YouTube")
     from src.pipeline.extract import run_extraction
     run_extraction()
 
 
 def run_score():
-    log.info("▶  Stage 2: Viral Scoring")
+    log.info("Step 2: Computing viral scores")
     from src.pipeline.viral_score import run_viral_scoring
     run_viral_scoring()
 
 
 def run_sentiment():
-    log.info("▶  Stage 3: Sentiment Analysis")
+    log.info("Step 3: Running sentiment analysis on comments")
     from src.nlp.sentiment import run_sentiment_pipeline
     run_sentiment_pipeline()
 
 
 def run_ab_test():
-    log.info("▶  Stage 4: A/B Testing")
+    log.info("Step 4: Running A/B tests")
     import pandas as pd
     from config.settings import DATA_PROCESSED_DIR, DATA_RAW_DIR
     from src.ml.ab_testing import run_all_ab_tests
@@ -63,7 +46,7 @@ def run_ab_test():
 
 
 def run_virality():
-    log.info("▶  Stage 5: Virality ML Model Training")
+    log.info("Step 5: Training virality prediction model")
     import pandas as pd
     from config.settings import DATA_PROCESSED_DIR, DATA_RAW_DIR
     from src.ml.virality_model import train_model
@@ -75,12 +58,11 @@ def run_virality():
 
     result = train_model(df)
     m = result["metrics"]
-    log.info(f"  RMSE={m['rmse']:.2f}, R²={m['r2']:.3f}, "
-             f"CV-R²={m['cv_r2_mean']:.3f}±{m['cv_r2_std']:.3f}")
+    log.info(f"  RMSE={m['rmse']:.2f}, R2={m['r2']:.3f}, CV-R2={m['cv_r2_mean']:.3f}")
 
 
 def run_recommend():
-    log.info("▶  Stage 6: Recommendation Engine")
+    log.info("Step 6: Generating content recommendations")
     import pandas as pd
     from config.settings import DATA_PROCESSED_DIR, DATA_RAW_DIR
     from src.ml.recommender import generate_recommendations
@@ -91,16 +73,16 @@ def run_recommend():
     df = pd.read_csv(path)
 
     report = generate_recommendations(df)
-    log.info(f"  {len(report.recommendations)} recommendations generated.")
+    log.info(f"  Generated {len(report.recommendations)} recommendations")
     for r in report.top(3):
         log.info(f"  [{r.impact}] {r.action[:65]}")
 
 
 def run_forecast():
-    log.info("▶  Stage 7: Trend Forecasting")
+    log.info("Step 7: Running trend forecasting")
     import pandas as pd
     from config.settings import DATA_PROCESSED_DIR, DATA_RAW_DIR
-    from src.ml.forecasting import run_forecast as _forecast, analyse_keyword_trends
+    from src.ml.forecasting import run_forecast as do_forecast, analyse_keyword_trends
 
     path = DATA_PROCESSED_DIR / "videos_scored.csv"
     if not path.exists():
@@ -108,14 +90,13 @@ def run_forecast():
     df = pd.read_csv(path)
 
     for metric in ["view_count", "like_count"]:
-        res = _forecast(df, metric=metric, periods=90)
+        res = do_forecast(df, metric=metric, periods=90)
         fut = res["future_only"]
-        log.info(f"  {metric}: avg={fut['yhat'].mean():,.0f}, "
-                 f"peak={fut['yhat'].max():,.0f} [{res['engine']}]")
+        log.info(f"  {metric}: avg={fut['yhat'].mean():,.0f}, peak={fut['yhat'].max():,.0f} [{res['engine']}]")
 
     trends = analyse_keyword_trends(df)
     if not trends.empty:
-        rising = trends[trends["trend"].str.contains("Rising")]["keyword"].tolist()
+        rising = trends[trends["trend"] == "Rising"]["keyword"].tolist()
         log.info(f"  Rising keywords: {rising[:5]}")
 
 
@@ -131,18 +112,14 @@ STAGES = {
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Run Data-Driven Social Engagement Pipeline")
-    parser.add_argument(
-        "--stage", default="all",
-        choices=list(STAGES.keys()) + ["all"],
-        help="Pipeline stage to run (default: all)",
-    )
+    parser = argparse.ArgumentParser(description="Run the Social Engagement Data Pipeline")
+    parser.add_argument("--stage", default="all",
+                        choices=list(STAGES.keys()) + ["all"],
+                        help="Which stage to run (default: all)")
     args = parser.parse_args()
 
-    log.info("═" * 60)
-    log.info("  Data-Driven Social Engagement Initiative")
-    log.info(f"  Stage: {args.stage.upper()}")
-    log.info("═" * 60)
+    log.info("Starting Data-Driven Social Engagement Initiative Pipeline")
+    log.info(f"Stage: {args.stage}")
 
     if args.stage == "all":
         for fn in STAGES.values():
@@ -150,5 +127,4 @@ if __name__ == "__main__":
     else:
         STAGES[args.stage]()
 
-    log.info("Pipeline finished. Launch dashboard with:")
-    log.info("  streamlit run src/dashboard/app.py")
+    log.info("Pipeline done. Run dashboard with: venv/bin/streamlit run src/dashboard/app.py")

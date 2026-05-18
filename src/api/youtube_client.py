@@ -1,47 +1,32 @@
-"""
-src/api/youtube_client.py
-─────────────────────────
-YouTube Data API v3 wrapper — uses `requests` directly (no httplib2).
-
-Responsibilities
-  • Fetch channel statistics.
-  • Fetch video list for a channel.
-  • Fetch per-video statistics (views, likes, comments).
-  • Fetch comment threads for a video.
-
-All functions return plain Python dicts / lists of dicts.
-"""
-
-from __future__ import annotations
-
+import sys
+from pathlib import Path
 from datetime import datetime, timezone
-from typing import Optional
 
 import requests
+
+ROOT = Path(__file__).resolve().parents[2]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from config.settings import YOUTUBE_API_KEY, YOUTUBE_CHANNEL_ID, YT_MAX_RESULTS, YT_COMMENT_PAGES
 from src.utils.logger import get_logger
 
 log = get_logger(__name__)
 
-_BASE = "https://www.googleapis.com/youtube/v3"
-_TIMEOUT = 30  # seconds per request
+BASE_URL = "https://www.googleapis.com/youtube/v3"
 
 
-def _get(endpoint: str, params: dict) -> dict:
-    """Make a GET request to the YouTube API and return the JSON response."""
+def call_api(endpoint, params):
     params["key"] = YOUTUBE_API_KEY
-    resp = requests.get(f"{_BASE}/{endpoint}", params=params, timeout=_TIMEOUT)
+    resp = requests.get(f"{BASE_URL}/{endpoint}", params=params, timeout=30)
     resp.raise_for_status()
     return resp.json()
 
 
-# ── Channel info ──────────────────────────────────────────────────────────────
-
-def fetch_channel_stats(channel_id: Optional[str] = None) -> dict:
+def fetch_channel_stats(channel_id=None):
     channel_id = channel_id or YOUTUBE_CHANNEL_ID
-    log.info(f"Fetching channel stats for {channel_id}")
-    data = _get("channels", {"part": "snippet,statistics", "id": channel_id})
+    log.info(f"Getting channel stats for {channel_id}")
+    data  = call_api("channels", {"part": "snippet,statistics", "id": channel_id})
     item  = data["items"][0]
     stats = item["statistics"]
     return {
@@ -53,59 +38,55 @@ def fetch_channel_stats(channel_id: Optional[str] = None) -> dict:
     }
 
 
-# ── Video list ────────────────────────────────────────────────────────────────
-
-def fetch_video_ids(channel_id: Optional[str] = None, max_videos: int = 200) -> list[str]:
+def fetch_video_ids(channel_id=None, max_videos=200):
     channel_id = channel_id or YOUTUBE_CHANNEL_ID
     log.info(f"Fetching video IDs for channel {channel_id}")
 
-    video_ids: list[str] = []
-    next_page_token: Optional[str] = None
+    video_ids = []
+    next_page = None
 
     while len(video_ids) < max_videos:
-        params: dict = {
+        params = {
             "part":       "id",
             "channelId":  channel_id,
             "maxResults": min(YT_MAX_RESULTS, max_videos - len(video_ids)),
             "order":      "date",
             "type":       "video",
         }
-        if next_page_token:
-            params["pageToken"] = next_page_token
+        if next_page:
+            params["pageToken"] = next_page
 
         try:
-            data = _get("search", params)
+            data = call_api("search", params)
         except requests.RequestException as e:
-            log.error(f"Error fetching video IDs: {e}")
+            log.error(f"Failed to fetch video IDs: {e}")
             break
 
         for item in data.get("items", []):
             video_ids.append(item["id"]["videoId"])
 
-        next_page_token = data.get("nextPageToken")
-        if not next_page_token:
+        next_page = data.get("nextPageToken")
+        if not next_page:
             break
 
-    log.info(f"Found {len(video_ids)} video IDs.")
+    log.info(f"Found {len(video_ids)} videos")
     return video_ids
 
 
-# ── Video details ─────────────────────────────────────────────────────────────
-
-def fetch_video_details(video_ids: list[str]) -> list[dict]:
-    log.info(f"Fetching details for {len(video_ids)} videos.")
-    results: list[dict] = []
+def fetch_video_details(video_ids):
+    log.info(f"Fetching details for {len(video_ids)} videos")
+    results = []
     now = datetime.now(timezone.utc).isoformat()
 
     for i in range(0, len(video_ids), 50):
-        chunk = video_ids[i : i + 50]
+        chunk = video_ids[i: i + 50]
         try:
-            data = _get("videos", {
+            data = call_api("videos", {
                 "part": "snippet,statistics,contentDetails",
                 "id":   ",".join(chunk),
             })
         except requests.RequestException as e:
-            log.error(f"Error fetching video details chunk {i}: {e}")
+            log.error(f"Error fetching video details: {e}")
             continue
 
         for item in data.get("items", []):
@@ -128,32 +109,30 @@ def fetch_video_details(video_ids: list[str]) -> list[dict]:
                 "fetched_at":    now,
             })
 
-    log.info(f"Retrieved details for {len(results)} videos.")
+    log.info(f"Got details for {len(results)} videos")
     return results
 
 
-# ── Comments ──────────────────────────────────────────────────────────────────
-
-def fetch_comments(video_id: str, max_pages: int = YT_COMMENT_PAGES) -> list[dict]:
+def fetch_comments(video_id, max_pages=YT_COMMENT_PAGES):
     log.info(f"Fetching comments for video {video_id}")
-    comments: list[dict] = []
-    next_page_token: Optional[str] = None
+    comments  = []
+    next_page = None
 
     for _ in range(max_pages):
-        params: dict = {
+        params = {
             "part":       "snippet",
             "videoId":    video_id,
             "maxResults": 100,
             "order":      "relevance",
             "textFormat": "plainText",
         }
-        if next_page_token:
-            params["pageToken"] = next_page_token
+        if next_page:
+            params["pageToken"] = next_page
 
         try:
-            data = _get("commentThreads", params)
+            data = call_api("commentThreads", params)
         except requests.RequestException as e:
-            log.warning(f"Cannot fetch comments for {video_id}: {e}")
+            log.warning(f"Could not fetch comments for {video_id}: {e}")
             break
 
         for item in data.get("items", []):
@@ -169,9 +148,9 @@ def fetch_comments(video_id: str, max_pages: int = YT_COMMENT_PAGES) -> list[dic
                 "sentiment_score": None,
             })
 
-        next_page_token = data.get("nextPageToken")
-        if not next_page_token:
+        next_page = data.get("nextPageToken")
+        if not next_page:
             break
 
-    log.info(f"Fetched {len(comments)} comments for {video_id}.")
+    log.info(f"Got {len(comments)} comments for video {video_id}")
     return comments

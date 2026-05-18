@@ -1,22 +1,3 @@
-"""
-src/nlp/sentiment.py
-─────────────────────
-PHASE 3 – Audience Sentiment Analyser
-
-Uses TextBlob for fast polarity scoring.
-Labels: Positive | Neutral | Negative
-
-For each comment:
-  • polarity ∈ [-1.0, +1.0]
-  • subjectivity ∈ [0.0, 1.0]  (bonus feature)
-  • label: "Positive" if > 0.1, "Negative" if < -0.1, else "Neutral"
-
-Run:
-    python -m src.nlp.sentiment
-"""
-
-from __future__ import annotations
-
 import sys
 from pathlib import Path
 
@@ -33,53 +14,49 @@ from src.utils.logger import get_logger
 
 log = get_logger(__name__)
 
-POS_THRESH =  0.10
-NEG_THRESH = -0.10
+POSITIVE_THRESHOLD =  0.10
+NEGATIVE_THRESHOLD = -0.10
 
 
-def _label(score: float) -> str:
-    if score > POS_THRESH:
+def get_label(score):
+    if score > POSITIVE_THRESHOLD:
         return "Positive"
-    if score < NEG_THRESH:
+    if score < NEGATIVE_THRESHOLD:
         return "Negative"
     return "Neutral"
 
 
-def analyse_sentiment(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Add sentiment_score and sentiment_label columns to a comments DataFrame.
-    Input df must have a 'text' column.
-    """
-    log.info(f"Running sentiment analysis on {len(df)} comments …")
-    df = df.copy()
-
+def analyse_sentiment(df):
+    log.info(f"Running sentiment analysis on {len(df)} comments")
+    df    = df.copy()
     blobs = df["text"].fillna("").apply(TextBlob)
-    df["sentiment_score"]     = blobs.apply(lambda b: round(b.sentiment.polarity,     4))
-    df["sentiment_label"]     = df["sentiment_score"].apply(_label)
-    df["subjectivity_score"]  = blobs.apply(lambda b: round(b.sentiment.subjectivity, 4))
+
+    df["sentiment_score"]    = blobs.apply(lambda b: round(b.sentiment.polarity,     4))
+    df["sentiment_label"]    = df["sentiment_score"].apply(get_label)
+    df["subjectivity_score"] = blobs.apply(lambda b: round(b.sentiment.subjectivity, 4))
 
     dist = df["sentiment_label"].value_counts().to_dict()
     log.info(f"Sentiment distribution: {dist}")
     return df
 
 
-def run_sentiment_pipeline() -> pd.DataFrame:
+def run_sentiment_pipeline():
     path = DATA_RAW_DIR / "comments.csv"
     if not path.exists():
-        log.error("comments.csv not found. Run extract.py first.")
+        log.error("comments.csv not found. Run extract.py first")
         raise FileNotFoundError(path)
 
     df = pd.read_csv(path)
     if df.empty or "text" not in df.columns:
-        log.warning("No comments to analyse — skipping sentiment stage.")
+        log.warning("No comments to analyse")
         return df
+
     df = analyse_sentiment(df)
 
     out = DATA_PROCESSED_DIR / "comments_sentiment.csv"
     df.to_csv(out, index=False)
-    log.info(f"Sentiment data saved → {out}")
+    log.info(f"Sentiment results saved to {out}")
 
-    # Push labels back to SQLite
     for _, row in df.iterrows():
         execute_write(
             "UPDATE comments SET sentiment_label=?, sentiment_score=? WHERE comment_id=?",
